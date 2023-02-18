@@ -15,13 +15,13 @@ const chosenItem = ref<HTMLElement | null>(null)
 const chosenItemIndex = ref(0)
 
 const getItemIndex = (target: Element) => {
-  return Array.from(sortableList.value?.children ?? []).findIndex((item) => item.id === target.id)
+  return Array.from(sortableList.value?.children ?? []).findIndex((item) => item === target)
 }
 
 const dragOver = (event: DragEvent) => {
   const el = event.currentTarget as HTMLElement
 
-  if (chosenItem.value?.id === el.id) {
+  if (chosenItem.value === el) {
     return
   }
 
@@ -49,7 +49,7 @@ const dragOver = (event: DragEvent) => {
 
 const dragStart = (event: DragEvent) => {
   chosenItem.value = event.target as HTMLElement
-  console.log(chosenItem.value.id)
+  console.log(chosenItem.value.children[0].textContent)
 }
 
 onMounted(() => {
@@ -66,8 +66,7 @@ onMounted(() => {
       class="w-88 h-120 px-4 py-2 rounded-md bg-white shadow-xl overflow-scroll"
   >
     <div
-        v-for="(fruit, ind) in fruits"
-        :id="`fruit-${ind}`"
+        v-for="fruit in fruits"
         :key="fruit"
         class="my-2 p-2 rounded-md border-1 bg-gray-100 shadow-sm"
         style="transform: translate3d(0px, 0px, 0px);"
