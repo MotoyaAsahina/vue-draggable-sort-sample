@@ -9,19 +9,21 @@ const fruits = [
   '25 pear', '26 apricot'
 ]
 
-const draggingId = ref('')
-const draggingIndex = ref(0)
+const sortableList = ref<HTMLDivElement | null>(null)
 
-const getItemIndex = (id: string) => {
-  return Array.from(document.getElementById("sortable-list")!.children).findIndex((item) => item.id === id)
+const chosenItem = ref<HTMLElement | null>(null)
+const chosenItemIndex = ref(0)
+
+const getItemIndex = (target: Element) => {
+  return Array.from(sortableList.value?.children ?? []).findIndex((item) => item.id === target.id)
 }
 
-const dragOver = (id: string) => {
-  if (draggingId.value === id) {
+const dragOver = (event: DragEvent) => {
+  const el = event.currentTarget as HTMLElement
+
+  if (chosenItem.value?.id === el.id) {
     return
   }
-
-  const el = document.getElementById(id)
 
   for (const anim of el?.getAnimations() ?? []) {
     if (anim.playState === 'running') {
@@ -30,29 +32,28 @@ const dragOver = (id: string) => {
   }
 
   if (el) {
-    const item = document.getElementById(draggingId.value);
-    console.log(`draggingIndex: ${draggingIndex.value}, getItemIndex: ${getItemIndex(id)}`);
+    console.log(`draggingIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(el)}`);
 
-    if (draggingIndex.value < getItemIndex(id)) {
-      el.after(item!)
+    if (chosenItemIndex.value < getItemIndex(el)) {
+      el.after(chosenItem.value!)
       el.style.animation = 'transform-up 150ms ease 0s'
-      item!.style.animation = 'transform-down 150ms ease 0s'
+      chosenItem.value!.style.animation = 'transform-down 150ms ease 0s'
     } else {
-      el.before(item!)
+      el.before(chosenItem.value!)
       el.style.animation = 'transform-down 150ms ease 0s'
-      item!.style.animation = 'transform-up 150ms ease 0s'
+      chosenItem.value!.style.animation = 'transform-up 150ms ease 0s'
     }
-    draggingIndex.value = getItemIndex(draggingId.value);
+    chosenItemIndex.value = getItemIndex(chosenItem.value!);
   }
 }
 
-const dragStart = (id: string) => {
-  draggingId.value = id
-  console.log(draggingId.value)
+const dragStart = (event: DragEvent) => {
+  chosenItem.value = event.target as HTMLElement
+  console.log(chosenItem.value.id)
 }
 
 onMounted(() => {
-  document.getElementById("sortable-list")?.addEventListener("dragover", (event) => {
+  sortableList.value!.addEventListener("dragover", (event) => {
     event.preventDefault();
     if (event.dataTransfer) event.dataTransfer.dropEffect = "move"
   });
@@ -60,16 +61,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="sortable-list" class="w-88 h-120 bg-white rounded-md shadow-xl px-4 py-2 overflow-scroll">
+  <div
+      ref="sortableList"
+      class="w-88 h-120 px-4 py-2 rounded-md bg-white shadow-xl overflow-scroll"
+  >
     <div
         v-for="(fruit, ind) in fruits"
         :id="`fruit-${ind}`"
         :key="fruit"
-        class="border-y-1 my-2 bg-gray-100 rounded-md p-2"
+        class="my-2 p-2 rounded-md border-1 bg-gray-100 shadow-sm"
         style="transform: translate3d(0px, 0px, 0px);"
         draggable="true"
-        @dragstart="dragStart(`fruit-${ind}`)"
-        @dragenter="dragOver(`fruit-${ind}`)"
+        @dragstart="dragStart($event)"
+        @dragenter="dragOver($event)"
     >
       <p class="cursor-pointer">
         {{ fruit }}
