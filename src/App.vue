@@ -14,8 +14,12 @@ const sortableList = ref<HTMLDivElement | null>(null)
 const chosenItem = ref<HTMLElement | null>(null)
 const chosenItemIndex = ref(0)
 
-const getItemIndex = (target: Element) => {
+const getItemIndex = (target: HTMLElement) => {
   return Array.from(sortableList.value?.children ?? []).findIndex((item) => item === target)
+}
+
+const getItemsSlice = (start: number, end: number) => {
+  return Array.from(sortableList.value?.children ?? []).slice(start, end)
 }
 
 const dragOver = (event: DragEvent) => {
@@ -34,21 +38,31 @@ const dragOver = (event: DragEvent) => {
   if (el) {
     console.log(`draggingIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(el)}`);
 
+    const prevIndex = chosenItemIndex.value
+
     if (chosenItemIndex.value < getItemIndex(el)) {
       el.after(chosenItem.value!)
-      el.style.animation = 'transform-up 150ms ease 0s'
+      chosenItemIndex.value = getItemIndex(chosenItem.value!);
+
+      getItemsSlice(prevIndex, chosenItemIndex.value).forEach((item) => {
+        (item as HTMLElement).style.animation = 'transform-up 150ms ease 0s'
+      })
       chosenItem.value!.style.animation = 'transform-down 150ms ease 0s'
     } else {
       el.before(chosenItem.value!)
-      el.style.animation = 'transform-down 150ms ease 0s'
+      chosenItemIndex.value = getItemIndex(chosenItem.value!);
+
+      getItemsSlice(chosenItemIndex.value+1, prevIndex+1).forEach((item) => {
+        (item as HTMLElement).style.animation = 'transform-down 150ms ease 0s'
+      })
       chosenItem.value!.style.animation = 'transform-up 150ms ease 0s'
     }
-    chosenItemIndex.value = getItemIndex(chosenItem.value!);
   }
 }
 
 const dragStart = (event: DragEvent) => {
   chosenItem.value = event.target as HTMLElement
+  chosenItemIndex.value = getItemIndex(chosenItem.value!)
   console.log(chosenItem.value.children[0].textContent)
 }
 
