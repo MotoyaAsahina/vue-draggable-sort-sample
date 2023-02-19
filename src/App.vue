@@ -40,7 +40,7 @@ const dragOver = (event: DragEvent) => {
 
   if (el) {
     console.log(
-      `draggingIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(
+      `chosenItemIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(
         el
       )}`
     )
@@ -83,7 +83,7 @@ onMounted(() => {
 
 <template>
   <div
-    :ref="sortableList"
+    ref="sortableList"
     class="w-88 h-120 px-4 py-2 rounded-md bg-white shadow-xl overflow-scroll"
   >
     <div
