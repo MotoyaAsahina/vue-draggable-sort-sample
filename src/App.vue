@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from 'vue'
 
+// prettier-ignore
 const fruits = [
   '1 apple', '2 banana', '3 orange', '4 grape', '5 melon', '6 strawberry',
   '7 peach', '8 lemon', '9 kiwi', '10 mango', '11 pineapple', '12 watermelon',
@@ -15,7 +16,9 @@ const chosenItem = ref<HTMLElement | null>(null)
 const chosenItemIndex = ref(0)
 
 const getItemIndex = (target: HTMLElement) => {
-  return Array.from(sortableList.value?.children ?? []).findIndex((item) => item === target)
+  return Array.from(sortableList.value?.children ?? []).findIndex(
+    item => item === target
+  )
 }
 
 const getItemsSlice = (start: number, end: number) => {
@@ -31,29 +34,33 @@ const dragOver = (event: DragEvent) => {
 
   for (const anim of el?.getAnimations() ?? []) {
     if (anim.playState === 'running') {
-      return;
+      return
     }
   }
 
   if (el) {
-    console.log(`draggingIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(el)}`);
+    console.log(
+      `draggingIndex: ${chosenItemIndex.value}, getItemIndex: ${getItemIndex(
+        el
+      )}`
+    )
 
     const prevIndex = chosenItemIndex.value
 
     if (chosenItemIndex.value < getItemIndex(el)) {
       el.after(chosenItem.value!)
-      chosenItemIndex.value = getItemIndex(chosenItem.value!);
+      chosenItemIndex.value = getItemIndex(chosenItem.value!)
 
-      getItemsSlice(prevIndex, chosenItemIndex.value).forEach((item) => {
-        (item as HTMLElement).style.animation = 'transform-up 150ms ease 0s'
+      getItemsSlice(prevIndex, chosenItemIndex.value).forEach(item => {
+        ;(item as HTMLElement).style.animation = 'transform-up 150ms ease 0s'
       })
       chosenItem.value!.style.animation = 'transform-down 150ms ease 0s'
     } else {
       el.before(chosenItem.value!)
-      chosenItemIndex.value = getItemIndex(chosenItem.value!);
+      chosenItemIndex.value = getItemIndex(chosenItem.value!)
 
-      getItemsSlice(chosenItemIndex.value+1, prevIndex+1).forEach((item) => {
-        (item as HTMLElement).style.animation = 'transform-down 150ms ease 0s'
+      getItemsSlice(chosenItemIndex.value + 1, prevIndex + 1).forEach(item => {
+        ;(item as HTMLElement).style.animation = 'transform-down 150ms ease 0s'
       })
       chosenItem.value!.style.animation = 'transform-up 150ms ease 0s'
     }
@@ -67,26 +74,26 @@ const dragStart = (event: DragEvent) => {
 }
 
 onMounted(() => {
-  sortableList.value!.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    if (event.dataTransfer) event.dataTransfer.dropEffect = "move"
-  });
+  sortableList.value!.addEventListener('dragover', event => {
+    event.preventDefault()
+    event.dataTransfer!.dropEffect = 'move'
+  })
 })
 </script>
 
 <template>
   <div
-      ref="sortableList"
-      class="w-88 h-120 px-4 py-2 rounded-md bg-white shadow-xl overflow-scroll"
+    :ref="sortableList"
+    class="w-88 h-120 px-4 py-2 rounded-md bg-white shadow-xl overflow-scroll"
   >
     <div
-        v-for="fruit in fruits"
-        :key="fruit"
-        class="my-2 p-2 rounded-md border-1 bg-gray-100 shadow-sm"
-        style="transform: translate3d(0px, 0px, 0px);"
-        draggable="true"
-        @dragstart="dragStart($event)"
-        @dragenter="dragOver($event)"
+      v-for="fruit in fruits"
+      :key="fruit"
+      class="my-2 p-2 rounded-md border-1 bg-gray-100 shadow-sm"
+      style="transform: translate3d(0px, 0px, 0px)"
+      draggable="true"
+      @dragstart="dragStart($event)"
+      @dragenter="dragOver($event)"
     >
       <p class="cursor-pointer">
         {{ fruit }}
@@ -95,5 +102,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
